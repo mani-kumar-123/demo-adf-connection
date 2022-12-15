@@ -1,0 +1,237 @@
+{
+	"name": "copyactivity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data_adls_db",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "SqlServerSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "adls_dataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"FilesystemName": {
+								"value": "@pipeline().parameters.Filesytem",
+								"type": "Expression"
+							},
+							"directory": {
+								"value": "@pipeline().parameters.Directory",
+								"type": "Expression"
+							},
+							"filename": {
+								"value": "@pipeline().parameters.FileName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "SqlServerTable_dataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"tablename": {
+								"value": "@pipeline().parameters.Tb1",
+								"type": "Expression"
+							},
+							"Server_name": {
+								"value": "@pipeline().parameters.server",
+								"type": "Expression"
+							},
+							"Db_name": {
+								"value": "@pipeline().parameters.DB",
+								"type": "Expression"
+							},
+							"user_name": {
+								"value": "@pipeline().parameters.User",
+								"type": "Expression"
+							},
+							"password": {
+								"value": "@pipeline().parameters.PW",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy data_db_db",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Copy data_adls_db",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "SqlServerSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SqlServerTable_dataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"tablename": {
+								"value": "@pipeline().parameters.Tb1",
+								"type": "Expression"
+							},
+							"Server_name": {
+								"value": "@pipeline().parameters.server",
+								"type": "Expression"
+							},
+							"Db_name": {
+								"value": "@pipeline().parameters.DB",
+								"type": "Expression"
+							},
+							"user_name": {
+								"value": "@pipeline().parameters.User",
+								"type": "Expression"
+							},
+							"password": {
+								"value": "@pipeline().parameters.PW",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "SqlServerTable2_dataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"table2": {
+								"value": "@pipeline().parameters.TB2",
+								"type": "Expression"
+							},
+							"serverName": {
+								"value": "@pipeline().parameters.server",
+								"type": "Expression"
+							},
+							"dbName": {
+								"value": "@pipeline().parameters.DDB",
+								"type": "Expression"
+							},
+							"userName": {
+								"value": "@pipeline().parameters.User",
+								"type": "Expression"
+							},
+							"ps": {
+								"value": "@pipeline().parameters.PW",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"Filesytem": {
+				"type": "String",
+				"defaultValue": "data"
+			},
+			"Directory": {
+				"type": "String",
+				"defaultValue": "input"
+			},
+			"FileName": {
+				"type": "String",
+				"defaultValue": "business.csv"
+			},
+			"Tb1": {
+				"type": "String",
+				"defaultValue": "business_sale"
+			},
+			"server": {
+				"type": "String",
+				"defaultValue": "sqlservervij.database.windows.net"
+			},
+			"DB": {
+				"type": "String",
+				"defaultValue": "sqldbvij"
+			},
+			"User": {
+				"type": "String",
+				"defaultValue": "sqluser"
+			},
+			"PW": {
+				"type": "String",
+				"defaultValue": "Azure@123"
+			},
+			"DDB": {
+				"type": "String",
+				"defaultValue": "sqldb2"
+			},
+			"TB2": {
+				"type": "String",
+				"defaultValue": "business_sales"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-12-15T05:51:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

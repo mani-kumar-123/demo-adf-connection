@@ -1,0 +1,9 @@
+{
+	"name": "azadfvij",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "f91d4d05-53b4-488b-b490-d9a44b1753fc",
+		"tenantId": "18c3b4f7-e526-4f98-939a-19118361cac0"
+	}
+}
